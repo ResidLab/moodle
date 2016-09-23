@@ -1,0 +1,186 @@
+<link type="text/css" rel="stylesheet"
+	href="../scripts/calendar/dhtmlgoodies_calendar.css" media="screen" />
+<link type="text/css"
+	rel="stylesheet" href="../scripts/form/form.css" media="screen" />
+<link rel="stylesheet"
+	href="../scripts/tooltip/form-field-tooltip.css" media="screen"
+	type="text/css">
+
+<script
+	type="text/javascript"
+	src="../scripts/calendar/dhtmlgoodies_calendar.js"></script>
+<script
+	type="text/javascript" src="../scripts/form/form.js"></script>
+<script
+	type="text/javascript" src="../scripts/tooltip/rounded-corners.js"></script>
+<script
+	type="text/javascript" src="../scripts/tooltip/form-field-tooltip.js"></script>
+
+<?php
+global $CFG, $DB;
+//include_once('../scripts/functions.php');
+//include_once('../../../config.php');
+//require_once("ClienteWim.php");
+$id_curso	= $_GET['course'];
+echo "aki".$id_curso;
+return;
+
+$info_turma = pegar_info_classe_wims($id_curso);
+
+if (!empty($info_turma) {
+    $referencia = current($info_turma)->ref_classe_wims;
+}
+
+if( !( $COURSE = $DB->get_record('course', 'id', $id_curso ) ) ) {
+	debug( 'Invalid course id' );
+
+}else if( ! $USER->id ) {
+	error('Invalid user');
+
+}else if (!empty($referencia)) {
+	error(' Invalid Access! ');
+}
+else {
+	$navlinks[0] = array('name' => get_string('blockname','block_wim'),'link' => "#",'type' => 'misc');
+
+	$navigation	= build_navigation($navlinks);
+
+	print_header_simple($course->fullname.': '.get_string('blockname','block_wim'), ': '.get_string('blockname','block_wim'),$navigation,'','',true,'','' );
+	echo '<br/><br/>';
+
+	if( !isset( $_POST['configcurso'] ) ) {
+		echo "<form name='form1' target=\"_self\" method='POST' action='#' onsubmit=\"if(!isFormValid()){alert('Verifique os campos marcados de vermelho !');return false;}\">";
+		echo "<br/><br/><input name='configcurso' type='hidden' value='1'>";
+
+		//$table->head = array('', '');
+		$table->align = array("center","left" );
+
+		$sqlconfigwim = "SELECT * FROM {$CFG->prefix}config_wim WHERE id_curso=$id_curso";
+		$dadosconfig = get_records_sql($sqlconfigwim);
+
+		$nome_instituicao = current( $dadosconfig )->nome_instituicao;
+		$nome_classe = current( $dadosconfig )->nome_classe;
+		$nivel_turma = current( $dadosconfig )->nivel_turma;
+		$nome_professor = current( $dadosconfig )->nome_professor;
+		$sobrenome_professor = current( $dadosconfig )->sobrenome_professor;
+		$email_professor = current( $dadosconfig )->email_professor;
+		$senha_professor = current( $dadosconfig )->senha_professor;
+		$senha_classe = current( $dadosconfig )->senha_classe;
+
+		$delimitador = '/';
+
+		$ano = substr(current( $dadosconfig )->data_expiracao_classe,0,4);
+		$mes = substr(current( $dadosconfig )->data_expiracao_classe,4,2);
+		$dia = substr(current( $dadosconfig )->data_expiracao_classe,6);
+
+		$data_expiracao_classe = $dia.$delimitador.$mes.$delimitador.$ano;
+
+		$numero_max_alunos = current( $dadosconfig )->numero_max_alunos;
+
+		$input0	= "<input name='nomeinstituicao' type='text' maxlength='50' required=1 value='$nome_instituicao' style='width:400px' tooltipText='Nome de sua institui&ccedil;&atilde;o.' />";
+		$input1	= "<input name='nomeclasse' type='text' maxlength='30' required=1 value='$nome_classe' style='width:400px' tooltipText='Nome de sua classe no ambiente WIMS.' />";
+		//$input2 = "<select name='nivelturma' required=1 tooltipText='Selecione o n&iacute;vel de sua turma.'>";
+		$input2 = "<select name='nivelturma' tooltipText='Selecione o n&iacute;vel de sua turma.'>";
+
+		for ($i=1;$i<=6;$i++) {
+			if('E'.$i == $nivel_turma) $input2 = $input2."<option value=E$i selected>E$i</option>";
+			else $input2 = $input2."<option value=E$i>E$i</option>";
+
+		}
+		for ($i=1;$i<=6;$i++) {
+			if('H'.$i == $nivel_turma) $input2 = $input2."<option value=H$i selected>H$i</option>";
+			else $input2 = $input2."<option value=H$i>H$i</option>";
+
+		}
+		for ($i=1;$i<=5;$i++) {
+			if('U'.$i == $nivel_turma) $input2 = $input2."<option value=U$i selected>U$i</option>";
+			else $input2 = $input2."<option value=U$i>U$i</option>";
+
+		}
+
+		if('G' == $nivel_turma) $input2 = $input2."<option value=G selected>G</option>";
+		else $input2 = $input2."<option value=G>G</option>";
+		if('R' == $nivel_turma) $input2 = $input2."<option value=R selected>R</option>";
+		else $input2 = $input2."<option value=R>R</option>";
+
+		$input2 = $input2."</select>";
+		$input3 = "<input name='nomeprofessor' type='text' maxlength='15' required=1 value='$nome_professor' style='width:400px' tooltipText='Nome do professor referente a classe no ambiente WIMS.' />";
+		$input4 = "<input name='sobrenomeprofessor' type='text' maxlength='15' required=1 value='$sobrenome_professor'  style='width:400px' tooltipText='Sobrenome do professor referente a classe no ambiente WIMS.' />";
+		$input5 = "<input name='emailprofessor' type='text' maxlength='50' mask='email' required=1 value='$email_professor' style='width:400px' tooltipText='Email para onde ser&aacute; enviado o c&oacute;digo para seu acesso a turma no ambiente WIMS.' />";
+		$input6 = "<input name='dataexpiracao' type='text' maxlength='10' required=1 value='$data_expiracao_classe' readonly onchange=validateInput(false,this); tooltipText='Data onde a classe no ambiente WIMS ir&aacute; expirar.' />
+                    <input type='button' value='Calendario'  onclick=displayCalendar(document.forms[0].dataexpiracao,'dd/mm/yyyy',this)>";
+
+		$input7 = "<select name='numeromaxalunos' required=1 tooltipText='ok'>";
+
+		for ($i=0;$i<=300;$i++) {
+			if($i == $numero_max_alunos) $input7 = $input7."<option value='$i' selected>$i</option>";
+			else $input7 = $input7."<option value='$i'>$i</option>";
+
+		}
+
+		$input7 = $input7."</select>";
+
+		$input7 = "<input name='numeromaxalunos' type='text' maxlength='15' readonly required=1 value=100 style='width:400px' tooltipText='N&uacute;mero m&aacute;ximo de alunos em uma classe no ambiente WIMS.' />";
+
+		$table->data[] = 'hr';
+
+		$table->data[] = array (get_string( 'configinput0','block_wim' ),$input0);
+		$table->data[] = array (get_string( 'configinput1','block_wim' ),$input1);
+		$table->data[] = array (get_string( 'configinput2','block_wim' ),$input2);
+		$table->data[] = array (get_string( 'configinput3','block_wim' ),$input3);
+		$table->data[] = array (get_string( 'configinput4','block_wim' ),$input4);
+		$table->data[] = array (get_string( 'configinput5','block_wim' ),$input5);
+		$table->data[] = array (get_string( 'configinput6','block_wim' ),$input6);
+		$table->data[] = array (get_string( 'configinput7','block_wim' ),$input7);
+
+
+
+		print_table($table);
+
+		echo "<br/><br/><input name='gravar' type='submit' value='Gravar'>";
+		echo "<input name='voltar' type='button' value='Voltar' onclick='history.back();'>";
+		echo "</form>";
+
+		print_footer( $course );
+
+	} else {
+
+		$dataexpiracao = explode("/",$_POST["dataexpiracao"]);
+		$_POST["dataexpiracao"] = $dataexpiracao[2].$dataexpiracao[1].$dataexpiracao[0];
+
+		$client = new ClienteWim();
+		$_POST['senhaprofessor'] = gera_senha(8);
+		$_POST['senhaclasse'] = gera_senha(8);
+
+		$session_name = 'wims'.$USER->id;
+		$_SESSION["$session_name"]["senhaprofessor"] = $_POST['senhaprofessor'];
+		$_SESSION["$session_name"]["senhaclasse"] = $_POST['senhaclasse'];
+		$_SESSION["$session_name"]["emailprofessor"] = $_POST['emailprofessor'];
+		
+		$resMessage = $client->cadastrarTurma($_POST);
+
+		if ($resMessage)
+		{
+			$simplexml = new SimpleXMLElement($resMessage->str);
+
+			if($simplexml->turmacadastrada == 'true'){
+				redirect("$CFG->wwwroot/blocks/wim/phppages/confirma_turma.php?course=$id_curso&session=$simplexml->session", get_string('msgsucesso', 'block_wim'));
+				print_footer( $course );
+			}else{
+				redirect("$CFG->wwwroot/course/view.php?id=$id_curso", get_string('msgerro_not_ws', 'block_wim'));
+			}
+		}
+		else{
+			redirect("$CFG->wwwroot/course/view.php?id=$id_curso", get_string('msgerro_not_ws', 'block_wim'));
+		}
+	}
+}
+?>
+
+<script type="text/javascript">
+    var tooltipObj = new DHTMLgoodies_formTooltip();
+    tooltipObj.setTooltipPosition('right');
+    tooltipObj.setPageBgColor('#EEEEEE');
+    tooltipObj.setTooltipCornerSize(15);
+    tooltipObj.initFormFieldTooltip();
+</script>
