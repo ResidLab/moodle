@@ -1,0 +1,30 @@
+--------------------------------------------------------------------------------
+| GLYPE PROXY LICENSE
+--------------------------------------------------------------------------------
+
+Glype proxy is free to download and free to use software. This is not the same
+as open-source. You are given permission to use this script subject to these terms.
+
+   - You may not remove the credit link back to our website without a valid license.
+     The "Powered by glype" link back to http://www.glype.com/ must remain intact
+     in any theme you use and must remain visible. If you wish to remove this link,
+     you must purchase a license.
+     
+   - You may not redistribute any of the glype proxy source code without prior
+     permission. This includes, but is not limited to, hosting mirrors of the
+     entire package or redistributing a modified version (or parts thereof).
+   
+   - The script is provided as is without warranty of any kind. Use is entirely at
+     your own risk and we cannot accept responsibility for any consequences arising
+     from the use of this script.
+
+In the event that any of the terms displayed here are violated, you will be
+exceeding the rights provided, thereby making null and void any permission
+granted and making such use an infringement of applicable copyright laws.
+
+We reserve the right to change these terms at any time and revoke permission to
+use the script at any time for any reason.
+
+ --------------------------------------------------------------------------------
+| Copyright 2008, http://www.glype.com/
+--------------------------------------------------------------------------------
